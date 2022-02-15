@@ -25,7 +25,7 @@ type Author = {
     age: number | string
 }
 
-const quotes: Quote[] = [
+let quotes: Quote[] = [
     {
         id: 1,
         quote: "The greatest glory in living lies not in never falling, but in rising every time we fall.",
@@ -78,7 +78,7 @@ const quotes: Quote[] = [
     },
 ];
 
-const authors: Author[] = [
+let authors: Author[] = [
     {
         id: 1,
         firstName: "Nelson",
@@ -254,6 +254,49 @@ app.post('/quotes', (req, res) => {
         res.status(201).send(newQuote)
         res.status(201).send(newAuthor)
     } else res.status(400).send({ errors: errors })
+})
+
+app.patch('/quotes/:id', (req, res) => {
+    const id = Number(req.params.id)
+
+    const quoteToChange = quotes.find(quote => quote.id === id)
+    if(quoteToChange){
+        if(typeof req.body.quote === 'string') quoteToChange.quote = req.body.quote
+        res.send(quoteToChange)
+    }else res.status(404).send({error: 'Quote not found'})
+})
+
+app.patch('/authors/:id', (req, res) => {
+    const id = Number(req.params.id)
+
+    const authorToChange = authors.find(author => author.id === id)
+    if(authorToChange){
+        if(typeof req.body.firstName === 'string') authorToChange.firstName = req.body.firstName
+        if(typeof req.body.lastName === 'string') authorToChange.lastName = req.body.lastName
+        if(typeof req.body.image === 'string') authorToChange.image = req.body.image
+        if(req.body.age) authorToChange.age = req.body.age
+        res.send(authorToChange)
+    }else res.status(404).send({error: 'Author not found'})
+})
+
+app.delete('/quotes/:id', (req, res) => {
+    const id = Number(req.params.id)
+
+    const match = quotes.find(quote => quote.id === id)
+    if(match) {
+        quotes = quotes.filter(quote => quote.id !== id)
+        res.send({message: 'Quote deleted'})
+    }else res.status(404).send({error: 'Quote not found'})
+})
+
+app.delete('/authors/:id', (req, res) => {
+    const id = Number(req.params.id)
+
+    const match = authors.find(author => author.id === id)
+    if(match) {
+        authors = authors.filter(author => author.id !== id)
+        res.send({message: 'Author deleted'})
+    }else res.status(404).send({error: 'Author not found'})
 })
 
 app.listen(PORT, () => {
